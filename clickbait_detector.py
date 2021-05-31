@@ -138,20 +138,20 @@ def main():
         
     correct_sum = 0
     total_size = 0
-    per_homograph = []
+    per_article = []
 
     for cor, s in zip(correct,size):
         correct_sum += cor
         total_size += s
-        per_homograph.append((cor/s)*100)
+        per_article.append((cor/s)*100)
     
     acc_total = 0
-    for acc in per_homograph:
+    for acc in per_article:
         acc_total += acc
 
     micro_avg = (correct_sum/total_size) * 100
     
-    macro_avg = statistics.mean(per_homograph)
+    macro_avg = statistics.mean(per_article)
     print(f'micro averaged accuracy: {micro_avg}\nmacro averaged accuracy: {macro_avg}')
 
 main()
