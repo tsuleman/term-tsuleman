@@ -107,7 +107,7 @@ def extract_features_labels(path:str):
     return features, labels
 
 def main():
-    train_path = "train"
+    train_path = "data/train"
     train_features, train_labels = extract_features_labels(train_path)
 
     vectorizer = sklearn.feature_extraction.DictVectorizer()
@@ -118,7 +118,7 @@ def main():
 
     model.fit(train_feature_vect,train_labels)
 
-    test_path = "test"
+    test_path = "data/test"
 
     test_features, test_labels = extract_features_labels(test_path)
 
