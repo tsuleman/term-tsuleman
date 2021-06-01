@@ -44,13 +44,20 @@ def extract_article_features(title: str):
             words.append(token)     
     features["title token count"] = str(len(words))
     
-    for token in tokens:
-        if token.isnumeric():
-            features["contains numbers"] = "True"
-        else: features["contains numbers"] = "False"
     POS_list = list_POS(tokens)
 
     features["no. of adj"] = str(count_POS("JJ",POS_list))
+    
+    for pos in ["RB","RBR","RBS"]:
+        if find_POS(pos,POS_list) == "True":
+            if POS_list.index(pos) == len(POS_list) - 1:
+              features["contains adv-adj phrase"] = "False"  
+            elif POS_list[POS_list.index(pos)+1] == "JJ":
+                features["contains adv-adj phrase"] = "True"
+            else: features["contains adv-adj phrase"] = "False"
+            break
+        else: features["contains adv-adj phrase"] = "False"
+
     
     if find_POS("WDT",POS_list) == "True" or find_POS("WP",POS_list) == "True" or find_POS("WPS",POS_list) == "True":
         features["contains wh-words"] = "True"
@@ -74,6 +81,11 @@ def extract_article_features(title: str):
             break
         else: features["second person"] = "False"
     
+    if find_POS("Should",tokens) == "True":
+        features["contains 'should'"] = "True"
+    else: features["contains 'should'"] = "False"
+
+    
     if find_token("?",tokens) == "True":
         features["has question mark"] = "True"
     else: features["has question mark"] = "False"
@@ -86,7 +98,7 @@ def extract_article_features(title: str):
         features["about tweets"] = "True"
     else: features["about tweets"] = "False"
 
-    for word in ["President","Government","Governor","Congress", "Congressional","Pope","Minister"]:
+    for word in ["President","Government","Governor","Congress", "Congressional","Pope","Minister","Politics","Political","Politician"]:
         if find_token(word,tokens) == "True":
             features["about politics"] = "True"
             break
@@ -127,31 +139,18 @@ def main():
     prediction = model.predict(test_feature_vect)
 
     correct = []
-    size = []
+    size = 0
     correct_count = 0
     
     for pred, label in zip(prediction,test_labels):
         if pred == label:
             correct_count += 1
-    correct.append(correct_count)
-    size.append(len(test_features))
+        size += 1
         
     correct_sum = 0
-    total_size = 0
-    per_article = []
 
-    for cor, s in zip(correct,size):
-        correct_sum += cor
-        total_size += s
-        per_article.append((cor/s)*100)
+    acc = (correct_count/size) * 100
     
-    acc_total = 0
-    for acc in per_article:
-        acc_total += acc
-
-    micro_avg = (correct_sum/total_size) * 100
-    
-    macro_avg = statistics.mean(per_article)
-    print(f'micro averaged accuracy: {micro_avg}\nmacro averaged accuracy: {macro_avg}')
+    print(f'accuracy: {acc}')
 
 main()
